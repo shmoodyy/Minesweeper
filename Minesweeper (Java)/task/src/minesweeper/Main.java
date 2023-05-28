@@ -8,8 +8,7 @@ public class Main {
     static final int ROWS = 9;
     static final int COLS = 9;
     static char[][] field = new char[ROWS][COLS];
-    static int correctGuesses = 0, incorrectGuesses = 0;
-
+    static int correctGuesses, incorrectGuesses;
     static final char ZERO = 48; // char ASCII value for '0'
     static int numOfMines;
     static List<int[]> mineLocations = new ArrayList<>();
