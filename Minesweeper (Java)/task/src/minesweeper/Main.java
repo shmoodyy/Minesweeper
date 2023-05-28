@@ -8,6 +8,8 @@ public class Main {
     static final int ROWS = 9;
     static final int COLS = 9;
     static char[][] field = new char[ROWS][COLS];
+    static int correctGuesses = 0, incorrectGuesses = 0;
+
     static final char ZERO = 48; // char ASCII value for '0'
     static int numOfMines;
     static List<int[]> mineLocations = new ArrayList<>();
@@ -17,34 +19,34 @@ public class Main {
     public static void main(String[] args) {
         System.out.print("How many mines do you want on the field? ");
         numOfMines = scanner.nextInt();
+        scanner.nextLine();
         populateField(numOfMines);
-        minesSwept(numOfMines);
+        metalDetector();
+        printField();
+        do {
+            minesSwept();
+        } while (!dead && correctGuesses < numOfMines && incorrectGuesses == 0);
         System.out.println(dead ? "You stepped on a mine and failed!" : "Congratulations! You found all the mines!");
     }
 
-    public static void minesSwept(int numOfMines) {
-        scanner.nextLine();
-        metalDetector();
+    public static void minesSwept() {
+        correctGuesses = incorrectGuesses = 0;
+        System.out.print("Set/unset mines marks or claim a cell as free: ");
+        String[] input = scanner.nextLine().strip().split("\\s+");
+        int y = Integer.parseInt(input[0]) - 1;
+        int x = Integer.parseInt(input[1]) - 1;
+        String mode = input[2].toLowerCase();
+        switch (mode) {
+            case "mine" -> mine(x, y);
+            case "free" -> free(x, y);
+        }
         printField();
-        int correctGuesses = 0, incorrectGuesses = 0;
-        do {
-            System.out.print("Set/unset mines marks or claim a cell as free: ");
-            String[] input = scanner.nextLine().strip().split("\\s+");
-            int y = Integer.parseInt(input[0]) - 1;
-            int x = Integer.parseInt(input[1]) - 1;
-            String mode = input[2].toLowerCase();
-            switch (mode) {
-                case "mine" -> mine(x, y);
-                case "free" -> free(x, y);
+        for (int row = 0; row < ROWS; row++) {
+            for (int col = 0; col < COLS; col++) {
+                if (field[row][col] == '*' && mineLocations.contains(new int[]{col, row})) correctGuesses++;
+                else if (field[row][col] == '*' && !mineLocations.contains(new int[]{col, row})) incorrectGuesses++;
             }
-            printField();
-            for (int row = 0; row < ROWS; row++) {
-                for (int col = 0; col < COLS; col++) {
-                    if (field[row][col] == '*' && mineLocations.contains(new int[]{col, row})) correctGuesses++;
-                    else if (field[row][col] == '*' && !mineLocations.contains(new int[]{col, row})) incorrectGuesses++;
-                }
-            }
-        } while (!dead && correctGuesses < numOfMines && incorrectGuesses == 0);
+        }
     }
 
     public static void revealAll() {
